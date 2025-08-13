@@ -7,5 +7,5 @@ Route::get('/test', function () {
     return response()->json(['message' => 'API works!']);
 });
 
-Route::get('/user', [UserController::class, 'index']);
-Route::post('/user', [UserController::class, 'store']);
+
+Route::apiResource('users', UserController::class);

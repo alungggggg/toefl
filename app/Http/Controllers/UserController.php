@@ -31,4 +31,44 @@ class UserController extends Controller
             return response()->json(['error' => 'Failed to create user: ' . $e->getMessage()], 500);
         }
     }
+
+    public function show($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+        return response()->json($user);
+    }
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'username' => 'sometimes|required|string|max:255|unique:users,username,' . $id,
+            'password' => 'sometimes|required|string|min:8|confirmed',
+        ]);
+
+        if ($request->has('password')) {
+            $request->merge(['password' => bcrypt($request->input('password'))]);
+        }
+
+        $user->update($request->all());
+        return response()->json($user);
+    }
+
+    public function destroy($id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+
+        $user->delete();
+        return response()->json(['message' => 'User deleted successfully']);
+    }
 }
