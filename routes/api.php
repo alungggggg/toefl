@@ -3,7 +3,9 @@
 use App\Http\Controllers\BundlerController;
 use App\Http\Controllers\ExamsBundlerController;
 use App\Http\Controllers\ExamsController;
+use App\Http\Controllers\ExamsScoresController;
 use App\Http\Controllers\ReadingController;
+use App\Http\Controllers\ScoreDetailController;
 use App\Http\Controllers\StructuringController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ListeningController;
@@ -21,7 +23,12 @@ Route::prefix('question')->group(function () {
 });
 
 // exam
-Route::apiResource('exam', ExamsController::class);
-Route::apiResource('exam/bundler', ExamsBundlerController::class);
+Route::prefix('exam')->group(function () {
+    Route::apiResource('/', ExamsController::class)->parameters(['' => 'exam']);
+    Route::apiResource('/bundlers', ExamsBundlerController::class);
+});
 
 // point
+Route::apiResource('/scores', ExamsScoresController::class);
+Route::apiResource('/scores/detail', ScoreDetailController::class);
+
