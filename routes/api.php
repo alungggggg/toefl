@@ -1,18 +1,22 @@
 <?php
 
-use App\Http\Controllers\BundlerController;
-use App\Http\Controllers\ExamsBundlerController;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ExamsController;
-use App\Http\Controllers\ExamsScoresController;
+use App\Http\Controllers\BundlerController;
 use App\Http\Controllers\ReadingController;
+use App\Http\Controllers\ListeningController;
+use App\Http\Controllers\ExamsScoresController;
 use App\Http\Controllers\ScoreDetailController;
 use App\Http\Controllers\StructuringController;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ListeningController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\ExamsBundlerController;
 
 // users datas path
 Route::apiResource('users', UserController::class);
+
+// auth
+Route::post('/login', [AuthController::class, 'login']);
 
 // question datas path
 Route::prefix('question')->group(function () {
