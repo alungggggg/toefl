@@ -17,6 +17,9 @@ Route::apiResource('users', UserController::class);
 
 // auth
 Route::post('/login', [AuthController::class, 'login']);
+Route::delete('/logout', [AuthController::class, 'logout']);
+
+Route::middleware(['auth:sanctum'])->group(function () {});
 
 // question datas path
 Route::prefix('question')->group(function () {
