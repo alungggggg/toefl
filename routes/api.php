@@ -13,13 +13,15 @@ use App\Http\Controllers\StructuringController;
 use App\Http\Controllers\ExamsBundlerController;
 
 // users datas path
-Route::apiResource('users', UserController::class);
 
 // auth
 Route::post('/login', [AuthController::class, 'login']);
 Route::delete('/logout', [AuthController::class, 'logout']);
 
-Route::middleware(['auth:sanctum'])->group(function () {});
+Route::middleware(['auth:sanctum'])->group(function () {
+
+    Route::apiResource('users', UserController::class);
+});
 
 // question datas path
 Route::prefix('question')->group(function () {
