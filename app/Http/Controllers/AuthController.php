@@ -26,8 +26,10 @@ class AuthController extends Controller
                     ->createToken('auth_token',['*'],now()->addDay(), $request->user()->uuid )->plainTextToken;
                 $userData["name"] = $request->user()->name;
                 return response()->json(['status' => true, "data" => $userData], 200);
+            }else{
+                return response()->json(["status" => false, 'message' => 'Invalid username or password'], status: 401);
+
             }
-            return response()->json(["status" => false, 'message' => 'Bad Request'], 400);
         }catch(\Exception $e){
             return response()->json(['status' => false, 'message' => 'Error: ' . $e->getMessage()], 500);
         }

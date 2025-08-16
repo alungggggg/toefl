@@ -18,7 +18,10 @@ class UserController extends Controller
             return User::all();
         });
 
-        return response()->json($users);
+        return response()->json([
+            "status" => true,
+            "data" => $users
+        ]);
     }
 
     // Ambil user berdasarkan ID dengan caching
@@ -30,11 +33,15 @@ class UserController extends Controller
 
         if (!$user) {
             return response()->json([
+                'status' => false,
                 'message' => 'User not found'
             ], 404);
         }
 
-        return response()->json($user);
+        return response()->json([
+            "status" => true,
+            "data" => $user
+        ]);
     }
 
     // Tambah user baru (hapus cache supaya data fresh)
@@ -64,6 +71,7 @@ class UserController extends Controller
             Cache::forget('users_all');
 
             return response()->json([
+                'status' => true,
                 'message' => 'User created successfully',
                 'data' => $user
             ], 201);
@@ -80,6 +88,7 @@ class UserController extends Controller
 
             if (!$user) {
                 return response()->json([
+                    'status' => false,
                     'message' => 'User not found'
                 ], 404);
             }
@@ -98,7 +107,7 @@ class UserController extends Controller
             ]);
 
             // Memeriksa dan mengenkripsi password jika ada
-            if ($request->has('password') && $request->password !== null) {
+            if ($request->has('password') && $request->password !== "") {
                 $validated['password'] = Hash::make($request->password);
             }
 
@@ -110,6 +119,7 @@ class UserController extends Controller
             Cache::forget('users_all');
 
             return response()->json([
+                'status' => true,
                 'message' => 'User updated successfully',
                 'data' => $user
             ]);
@@ -126,6 +136,7 @@ class UserController extends Controller
 
         if (!$user) {
             return response()->json([
+                'status' => false,
                 'message' => 'User not found'
             ], 404);
         }
@@ -137,7 +148,9 @@ class UserController extends Controller
         Cache::forget('users_all');
 
         return response()->json([
-            'message' => 'User deleted successfully'
+            'status' => true,
+            'message' => 'User deleted successfully',
+            'data' => $user
         ]);
     }
 }

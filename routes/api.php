@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\ExamsForum;
+use App\Models\ExamsScores;
+use App\Models\QuestionBundler;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -16,28 +20,46 @@ use App\Http\Controllers\ExamsBundlerController;
 
 // auth
 Route::post('/login', [AuthController::class, 'login']);
-Route::delete('/logout', [AuthController::class, 'logout']);
 
 Route::middleware(['auth:sanctum'])->group(function () {
+    // logout
+    Route::delete('/logout', [AuthController::class, 'logout']);
 
     Route::apiResource('users', UserController::class);
+
+    // question datas path
+    Route::prefix('question')->group(function () {
+        Route::apiResource('listening', ListeningController::class);
+        Route::apiResource('reading', ReadingController::class);
+        Route::apiResource('structuring', controller: StructuringController::class);
+        Route::apiResource('bundler', controller: BundlerController::class);
+    });
+
+    // exam
+    Route::prefix('exam')->group(function () {
+        Route::apiResource('/', ExamsController::class)->parameters(['' => 'exam']);
+        Route::apiResource('/bundlers', ExamsBundlerController::class);
+    });
+
+    // point
+    Route::apiResource('/scores', ExamsScoresController::class);
+    Route::apiResource('/scores/detail', ScoreDetailController::class);
+
+    // dashboard data
+    Route::get('/dashboard', function () {
+        return response()->json([
+            "status" => true,
+            "data" => [
+                'total_users' => User::count(),
+                'total_exams' => ExamsForum::count(),
+                'total_bundler' => QuestionBundler::count(),
+                'attendance' => ExamsScores::count()
+            ]
+        ]);
+    });
+
 });
 
-// question datas path
-Route::prefix('question')->group(function () {
-    Route::apiResource('listening', ListeningController::class);
-    Route::apiResource('reading', ReadingController::class);
-    Route::apiResource('structuring', controller: StructuringController::class);
-    Route::apiResource('bundler', controller: BundlerController::class);
-});
 
-// exam
-Route::prefix('exam')->group(function () {
-    Route::apiResource('/', ExamsController::class)->parameters(['' => 'exam']);
-    Route::apiResource('/bundlers', ExamsBundlerController::class);
-});
 
-// point
-Route::apiResource('/scores', ExamsScoresController::class);
-Route::apiResource('/scores/detail', ScoreDetailController::class);
 
