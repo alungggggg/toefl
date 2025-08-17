@@ -43,7 +43,7 @@ class BundlerController extends Controller
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $bundlers
         ]);
 
@@ -54,24 +54,29 @@ class BundlerController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category' => 'nullable|string|max:10',
-            'level' => 'nullable|string|max:10',
-            'is_active' => 'boolean'
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'category' => 'required|string|max:10',
+                'level' => 'required|string|max:10',
+                'is_active' => 'required|boolean'
+            ]);
 
-        $bundler = QuestionBundler::create($validated);
+            $bundler = QuestionBundler::create($validated);
 
-        // Hapus cache agar data terbaru muncul
-        Cache::forget('bundlers_all');
+            // Hapus cache agar data terbaru muncul
+            Cache::forget('bundlers_all');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Bundler berhasil dibuat',
-            'data' => $bundler
-        ], 201);
+            return response()->json([
+                'status' => true,
+                'message' => 'Bundler berhasil dibuat',
+                'data' => $bundler
+            ], 201);
+        } catch (\Throwable $th) {
+            return response()->json(['status' => false, 'message' => $th->getMessage()], 500);
+        }
+
     }
 
     /**
@@ -112,13 +117,13 @@ class BundlerController extends Controller
 
         if (!$bundler) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Bundler tidak ditemukan'
             ], 404);
         }
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $bundler
         ]);
     }
@@ -132,7 +137,7 @@ class BundlerController extends Controller
 
             if (!$bundler) {
                 return response()->json([
-                    'success' => false,
+                    'status' => false,
                     'message' => 'Bundler tidak ditemukan'
                 ], 404);
             }
@@ -152,7 +157,7 @@ class BundlerController extends Controller
             Cache::forget("bundler_{$id}");
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Bundler berhasil diperbarui',
                 'data' => $bundler
             ]);
@@ -170,9 +175,20 @@ class BundlerController extends Controller
 
         if (!$bundler) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Bundler tidak ditemukan'
             ], 404);
+        }
+
+        $relations = ['readingQuestions', 'listeningQuestions', 'structuringQuestions'];
+
+        foreach ($relations as $relation) {
+            if ($bundler->$relation()->exists()) {
+                return response()->json([
+                    'status' => false,
+                    'message' => 'Bundler tidak dapat dihapus karena masih memiliki data question'
+                ], 400);
+            }
         }
 
         $bundler->delete();
@@ -182,8 +198,9 @@ class BundlerController extends Controller
         Cache::forget("bundler_{$id}");
 
         return response()->json([
-            'success' => true,
-            'message' => 'Bundler berhasil dihapus'
+            'status' => true,
+            'message' => 'Bundler berhasil dihapus',
+            "data" => $bundler
         ]);
     }
 }
