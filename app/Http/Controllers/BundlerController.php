@@ -58,8 +58,8 @@ class BundlerController extends Controller
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
-                'category' => 'required|string|max:10',
-                'level' => 'required|string|max:10',
+                'category' => 'required|string|max:20',
+                'level' => 'required|string|max:20',
                 'is_active' => 'required|boolean'
             ]);
 
@@ -145,8 +145,8 @@ class BundlerController extends Controller
             $validated = $request->validate([
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
-                'category' => 'required|string|max:10',
-                'level' => 'required|string|max:10',
+                'category' => 'required|string|max:20',
+                'level' => 'required|string|max:20',
                 'is_active' => 'required|boolean'
             ]);
 
