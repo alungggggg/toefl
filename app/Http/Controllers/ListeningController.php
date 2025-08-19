@@ -16,12 +16,14 @@ class ListeningController extends Controller
 
         $questions = Cache::remember($cacheKey, 3600, function () use ($bundlerId) {
             return $bundlerId
-                ? ListeningQuestion::where('bundler_id', $bundlerId)->get()
-                : ListeningQuestion::all();
+                ? ListeningQuestion::where('bundler_id', $bundlerId)
+                    ->orderBy('question_index', 'asc')
+                    ->get()
+                : ListeningQuestion::orderBy('question_index', 'asc')->get();
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $questions
         ]);
     }
@@ -34,11 +36,11 @@ class ListeningController extends Controller
         });
 
         if (!$question) {
-            return response()->json(['success' => false, 'message' => 'Question not found'], 404);
+            return response()->json(['status' => false, 'message' => 'Question not found'], 404);
         }
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $question
         ]);
     }
@@ -72,13 +74,13 @@ class ListeningController extends Controller
             $this->clearCache($question->id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Listening question berhasil ditambahkan',
                 'data' => $question
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -91,7 +93,7 @@ class ListeningController extends Controller
             $question = ListeningQuestion::find($id);
             if (!$question) {
                 return response()->json([
-                    'success' => false,
+                    'status' => false,
                     'message' => 'Question not found'
                 ], 404);
             }
@@ -119,13 +121,13 @@ class ListeningController extends Controller
             $this->clearCache($id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Listening question berhasil diupdate',
                 'data' => $question
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -138,7 +140,7 @@ class ListeningController extends Controller
         $question = ListeningQuestion::find($id);
         if (!$question) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Question not found'
             ], 404);
         }
@@ -156,8 +158,9 @@ class ListeningController extends Controller
         $this->clearCache($id, $question->bundler_id);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Successfully deleted the question and its audio file'
+            'status' => true,
+            'message' => 'Successfully deleted the question and its audio file',
+            'data' => $question
         ]);
     }
 
