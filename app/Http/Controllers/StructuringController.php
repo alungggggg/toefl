@@ -18,12 +18,12 @@ class StructuringController extends Controller
 
         $data = Cache::remember($cacheKey, 3600, function () use ($bundlerId) {
             return $bundlerId
-                ? StructuringQuestion::where('bundler_id', $bundlerId)->get()
-                : StructuringQuestion::all();
+                ? StructuringQuestion::where('bundler_id', $bundlerId)->orderBy('question_index', 'asc')->get()
+                : StructuringQuestion::orderBy('question_index', 'asc')->get();
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $data
         ]);
     }
@@ -50,13 +50,13 @@ class StructuringController extends Controller
             $this->clearCache($question->id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Structuring question berhasil ditambahkan',
                 'data' => $question
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage(),
             ], 500);
         }
@@ -73,13 +73,13 @@ class StructuringController extends Controller
 
         if (!$question) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Structuring question tidak ditemukan'
             ], 404);
         }
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $question
         ]);
     }
@@ -94,7 +94,7 @@ class StructuringController extends Controller
 
             if (!$question) {
                 return response()->json([
-                    'success' => false,
+                    'status' => false,
                     'message' => 'Structuring question tidak ditemukan'
                 ], 404);
             }
@@ -115,13 +115,13 @@ class StructuringController extends Controller
             $this->clearCache($id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Structuring question berhasil diupdate',
                 'data' => $question
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage(),
             ]);
         }
@@ -136,7 +136,7 @@ class StructuringController extends Controller
 
         if (!$question) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Structuring question tidak ditemukan'
             ], 404);
         }
@@ -147,8 +147,9 @@ class StructuringController extends Controller
         $this->clearCache($id, $question->bundler_id);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Structuring question berhasil dihapus'
+            'status' => true,
+            'message' => 'Structuring question berhasil dihapus',
+            'data' => $question
         ]);
     }
 
