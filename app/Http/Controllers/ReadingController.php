@@ -23,7 +23,7 @@ class ReadingController extends Controller
         });
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $data
         ]);
     }
@@ -37,7 +37,7 @@ class ReadingController extends Controller
             $validated = $request->validate([
                 'bundler_id' => 'required|integer',
                 'section' => 'required|string|max:50',
-                'passage' => 'required|string',
+                'passage' => 'nullable|string',
                 'question_text' => 'required|string',
                 'options' => 'required|array',
                 'correct_answer' => 'required|string',
@@ -51,13 +51,13 @@ class ReadingController extends Controller
             $this->clearCache($question->id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Reading question berhasil ditambahkan',
                 'data' => $question
             ], 201);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -74,13 +74,13 @@ class ReadingController extends Controller
 
         if (!$question) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Reading question tidak ditemukan'
             ], 404);
         }
 
         return response()->json([
-            'success' => true,
+            'status' => true,
             'data' => $question
         ]);
     }
@@ -95,7 +95,7 @@ class ReadingController extends Controller
 
             if (!$question) {
                 return response()->json([
-                    'success' => false,
+                    'status' => false,
                     'message' => 'Reading question tidak ditemukan'
                 ], 404);
             }
@@ -103,7 +103,7 @@ class ReadingController extends Controller
             $validated = $request->validate([
                 'bundler_id' => 'required|integer',
                 'section' => 'required|string|max:50',
-                'passage' => 'required|string',
+                'passage' => 'nullable|string',
                 'question_text' => 'required|string',
                 'options' => 'required|array',
                 'correct_answer' => 'required|string',
@@ -117,13 +117,13 @@ class ReadingController extends Controller
             $this->clearCache($id, $question->bundler_id);
 
             return response()->json([
-                'success' => true,
+                'status' => true,
                 'message' => 'Reading question berhasil diupdate',
                 'data' => $question
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => $th->getMessage()
             ], 500);
         }
@@ -138,7 +138,7 @@ class ReadingController extends Controller
 
         if (!$question) {
             return response()->json([
-                'success' => false,
+                'status' => false,
                 'message' => 'Reading question tidak ditemukan'
             ], 404);
         }
@@ -149,8 +149,9 @@ class ReadingController extends Controller
         $this->clearCache($id, $question->bundler_id);
 
         return response()->json([
-            'success' => true,
-            'message' => 'Reading question berhasil dihapus'
+            'status' => true,
+            'message' => 'Reading question berhasil dihapus',
+            'data' => $question
         ]);
     }
 
